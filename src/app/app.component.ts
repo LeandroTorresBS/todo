@@ -3,6 +3,11 @@ import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { Todo } from 'src/models/todo.model';
 import { THIS_EXPR } from '@angular/compiler/src/output/output_ast';
 
+
+// centralizando os valores em constante para se precisar utilizar em outros lugares e facilitar a vizualização e edição
+const minLength = 3;
+const maxLength = 60;
+
 @Component({
   selector: 'app-root', //<app-root>
   templateUrl: './app.component.html',
@@ -14,15 +19,11 @@ export class AppComponent {
   public todos: Todo[] = []; //[]
 //public todos: any[]; //undefined
   public title: String = 'Minhas Tarefas';
-  public form: FormGroup
+  public form: FormGroup;
 
   constructor(private fb: FormBuilder) {
     this.form = this.fb.group({
-      title: ['', Validators.compose([
-        Validators.minLength(3),
-        Validators.maxLength(60),
-        Validators.required
-      ])]
+      title: ['', Validators.compose(this.validation())]
     })
     //this.todos.push(new Todo(1,'Passear com o catioro', false));
     //this.todos.push(new Todo(2, 'Ir ao fukatu fukazu', false));
@@ -34,6 +35,13 @@ export class AppComponent {
     this.load();
   }
 
+  // separação das validações para ficar mais vizivel
+  validation = () => [
+    Validators.minLength(minLength),
+    Validators.maxLength(maxLength),
+    Validators.required
+  ];
+
   add(){
     //this.form.value => { title: 'Titulo'} 
     const title = this.form.controls['title'].value;
@@ -43,9 +51,8 @@ export class AppComponent {
     this.clear();
   }
 
-  clear(){
-    this.form.reset();
-  }
+  // function anónima e lambda
+  clear = () => this.form.reset();
 
   /*alteraTexto(){
     this.title = 'Teste';
@@ -77,14 +84,10 @@ export class AppComponent {
 
   load(){
     const data = localStorage.getItem('todos'); //[{"id":1,"title":"dadad","done":false}]
-    if(data){
-      this.todos = JSON.parse(data);
-    }else{
-      this.todos = [];
-    }
+    // substituição do if por ternario
+    this.todos = data ? JSON.parse(data) : [];
   }
 
-  changeMode(mode:string){
-    this.mode = mode;
-  }
+  // function anónima e lambda
+  changeMode = (mode:string) => this.mode = mode;
 }
